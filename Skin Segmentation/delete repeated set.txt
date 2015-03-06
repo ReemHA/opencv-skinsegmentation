@@ -1,0 +1,93 @@
+//read from file and compare hue and saturation values with the skin dataset I already collected in file skin_dataset
+	/*			for (int i = 0; i < imageFilter.rows; i++)
+			{
+				for (int j = 0; j < imageFilter.cols; j++)
+				{
+					Vec3b pHSV = imageFilter.at<Vec3b>(i,j);
+					dataset_file.open("skin_dataset.txt");
+					if (dataset_file.is_open()){
+						while (!dataset_file.eof){
+							getline(dataset_file, line[a]);
+							if (((int)pHSV[0] == stoi(line[a]) && (int)pHSV[1] == stoi(line[a + 2]))){
+								namedWindow("Finale", CV_WINDOW_AUTOSIZE);
+							}
+							else{
+								//do nothing
+							}
+						}
+					}
+					dataset_file.close();
+				}
+
+			}
+		
+	*/
+
+
+
+
+
+
+
+Mat prefinal_image;
+	Mat kernel;
+	kernel = getStructuringElement(MORPH_RECT, Size(2, 2));
+	dilate(imageFilter, prefinal_image, kernel, Point(0, 0), 3, 0);
+	erode(prefinal_image, prefinal_image, kernel, Point(0, 0), 6, 0);
+	dilate(prefinal_image, prefinal_image, kernel, Point(0, 0), 3, 0);
+
+
+	inRange(prefinal_image, Scalar(4, 50, 142), Scalar(16, 189, 226), final_image);
+	imshow("The dilated", final_image);
+
+
+
+findContours(temp, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+
+	Mat dst;
+	dst = Mat::zeros(final_image.size(), CV_8UC3);
+
+	if (contours.size() == 0);
+	int idx = 0, largestComp = 0;
+	double maxArea = 0;
+
+	for (; idx >= 0; idx = hierarchy[idx][0])
+	{
+		const vector<Point>& c = contours[idx];
+		double area = fabs(contourArea(Mat(c)));
+		if (area > maxArea)
+		{
+			maxArea = area;
+			largestComp = idx;
+		}
+	}
+	Scalar color(0, 0, 255);
+	drawContours(dst, contours, largestComp, color, CV_FILLED, 8, hierarchy);
+	imshow("segmented", dst);
+
+	
+
+for (; idx >= 0; idx = hierarchy[idx][0])
+	{
+		const vector<Point>& c = contours[idx];
+		double peri = arcLength(contours[idx], true);
+		if (arcLength(contours_temp[idx], true) - peri > 0 || arcLength(contours_temp[idx], true) - peri == 0)
+		{
+			Scalar color(0, 0, 255);
+			drawContours(dst, contours, idx, color, CV_FILLED, 8, hierarchy);
+		}
+	}
+
+
+//	matchTemplate(contours[0], contours_temp[0], result_temp, CV_TM_SQDIFF_NORMED);
+	//	cmp_contours = matchShapes(contours[idx], contours_temp[1], 1, 0.0);
+
+		double peri = arcLength(contours[idx], true);
+		if ((arcLength(contours_temp[0], true) - peri > 0) && (arcLength(contours_temp[0], true) - peri < 5) || arcLength(contours_temp[0], true) - peri == 0)
+		{
+			Scalar color(0, 0, 255);
+			drawContours(dst, contours, idx, color, CV_FILLED, 8, hierarchy);
+		}
+	}
+	
+	imshow("segmented", dst);
